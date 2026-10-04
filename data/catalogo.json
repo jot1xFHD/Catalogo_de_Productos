@@ -1,10 +1,10 @@
 {
- "version": 1,
- "actualizado": "2026-10-04T17:04:54.913Z",
+ "version": 2,
+ "actualizado": "2026-10-04T19:45:35.974Z",
  "ajustes": {
   "negocio": "Mi Catálogo",
-  "eslogan": "Pide tu cotización por WhatsApp",
   "whatsapp": "573000000000",
+  "eslogan": "Pide tu cotización por WhatsApp",
   "saludo": "Hola, quiero cotizar los siguientes productos:"
  },
  "categorias": [
@@ -18,6 +18,20 @@
   "Hogar"
  ],
  "productos": [
+  {
+   "id": "pmuu7iakgm3t3",
+   "nombre": "PRUEBA",
+   "ref": "123123",
+   "categoria": "Iluminación",
+   "descripcion": "PRueba",
+   "etiquetas": [
+    "prueba"
+   ],
+   "imagen": "media/img/prueba-muu7hseiqaqm.webp",
+   "video": "https://www.youtube.com/watch?v=OVzOHHEkmY4",
+   "visible": true,
+   "destacado": true
+  },
   {
    "id": "demo-001",
    "ref": "HER-1001",
