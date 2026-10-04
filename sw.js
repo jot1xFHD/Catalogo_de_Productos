@@ -8,7 +8,7 @@
    Si haces cambios grandes a la app (html/css/js), sube VERSION para
    forzar que todos los dispositivos descarguen la nueva versión.
    ============================================================ */
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE_APP = 'catalogo-app-' + VERSION;
 const CACHE_DATOS = 'catalogo-datos-v1';
 const CACHE_MEDIA = 'catalogo-media-v1';   // debe coincidir con js/app.js
@@ -25,6 +25,7 @@ const ARCHIVOS_APP = [
   'js/app.js',
   'js/admin.js',
   'js/zip.js',
+  'js/qr.js',
   'js/github.js',
   'generar-clave.html',
   'icons/icon.svg',

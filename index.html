@@ -104,6 +104,23 @@
     </form>
   </dialog>
 
+  <!-- Cotización sin internet: código QR -->
+  <dialog id="dlg-qr" class="dlg dlg-qr" aria-labelledby="titulo-qr">
+    <div class="lateral-cab">
+      <h2 id="titulo-qr">Cotización sin internet</h2>
+      <button class="btn-cerrar" data-cerrar aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="qr-cuerpo">
+      <p class="qr-ayuda">Este dispositivo no tiene internet. Escanea el código con la <strong>cámara de un celular que tenga WhatsApp</strong>: se abrirá el chat con la cotización lista para enviar.</p>
+      <div id="qr-codigo" class="qr-codigo"></div>
+      <p id="qr-resumen" class="nota"></p>
+      <p id="qr-denso" class="nota" hidden>Código grande: si la cámara no lo lee, sube el brillo de esta pantalla, acerca el celular o divide la lista en dos.</p>
+      <button id="btn-qr-listo" class="btn btn-pri btn-bloque">Ya se escaneó · Vaciar lista</button>
+      <button class="btn-link" data-cerrar>Volver a la lista</button>
+      <a id="qr-abrir" class="btn-link" href="#" target="_blank" rel="noopener">¿Sí tienes internet? Abrir WhatsApp</a>
+    </div>
+  </dialog>
+
   <!-- Menú de opciones -->
   <dialog id="dlg-menu" class="dlg dlg-chico" aria-labelledby="titulo-menu">
     <div class="lateral-cab">
@@ -125,6 +142,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/datos.js"></script>
+  <script src="js/qr.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

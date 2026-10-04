@@ -54,7 +54,12 @@ Comentario: Entrega en Popayán
 2. Abrir la app instalada → **⋮ → marcar "Incluir videos" → Descargar catálogo** y esperar a que diga *Listo*. Ahí mismo se ve la fecha del catálogo guardado.
 3. Repetir el paso 2 cada vez que el dueño publique productos nuevos (solo descarga lo que falta).
 
-**En campo (sin señal):** abrir la app desde el ícono, mostrar productos y videos al cliente, armar la lista, escribir el nombre del cliente en *Tu nombre* y pulsar **Solicitar cotización por WhatsApp**. Sin señal se abre directamente la app de WhatsApp: el mensaje queda con el relojito 🕓 y **se envía solo cuando vuelva la señal**. Al regresar al catálogo, la app ofrece vaciar la lista para atender al siguiente cliente.
+**En campo (sin internet):** abrir la app desde el ícono, mostrar productos y videos al cliente, armar la lista, escribir el nombre del cliente en *Tu nombre* y pulsar **Solicitar cotización por WhatsApp**.
+
+- **Con internet:** se abre WhatsApp con la cotización, como siempre.
+- **Sin internet** (o con señal pero sin datos, que se detecta con una verificación de 2,5 s): en lugar de abrir WhatsApp se muestra un **código QR** con el enlace de la cotización. Se escanea con la cámara de un celular que tenga WhatsApp y datos (por ejemplo el del cliente) y se abre el chat con el mensaje listo para enviar. Después se toca **Ya se escaneó · Vaciar lista** para atender al siguiente cliente.
+- Un QR cómodo de escanear admite unos **13 productos**; caben hasta unos **34**. Si la lista es más larga, la app pide dividirla en dos.
+- El QR se genera dentro de la app ([`js/qr.js`](js/qr.js), sin librerías ni internet).
 
 ## 4. Cómo administra el dueño
 
@@ -124,6 +129,7 @@ js/datos.js           Carga del catálogo y almacenamiento local (IndexedDB)
 js/app.js             Catálogo, búsqueda, detalle, carrito y WhatsApp
 js/admin.js           Lógica del panel
 js/zip.js             Generador de .zip sin librerías
+js/qr.js              Generador de códigos QR sin librerías (cotización offline)
 js/github.js          Publicación directa en GitHub (un commit por publicación)
 data/catalogo.json    Productos publicados (trae 250 de ejemplo)
 media/img, media/video  Imágenes y videos

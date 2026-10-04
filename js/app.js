@@ -318,7 +318,7 @@
     ];
     estado.carrito.forEach((it, n) => {
       const p = estado.porId.get(it.id) || it;
-      lineas.push(`${n + 1}. *${p.nombre}*${p.ref ? ' (Ref. ' + p.ref + ')' : ''} — Cant: ${it.cant}`);
+      lineas.push(`${n + 1}. *${p.nombre}*${p.ref ? ' (Ref. ' + p.ref + ')' : ''} - Cant: ${it.cant}`);
     });
     lineas.push('', `Total: ${estado.carrito.length} producto(s), ${unidades} unidad(es)`);
     if (nombre) lineas.push('', 'Mi nombre: ' + nombre);
@@ -326,25 +326,74 @@
     return lineas.join('\n');
   }
 
-  function enviarWhatsApp(ev) {
+  async function enviarWhatsApp(ev) {
     ev.preventDefault();
     if (!estado.carrito.length) return;
     const numero = String(estado.catalogo.ajustes.whatsapp || '').replace(/\D/g, '');
     if (!numero) { toast('El número de WhatsApp del negocio no está configurado.'); return; }
     try { localStorage.setItem('cliente-nombre', $('#cliente-nombre').value.trim()); } catch (e) {}
-    const texto = encodeURIComponent(mensajeWhatsApp());
-    const movil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(mensajeWhatsApp());
+
+    const btn = $('#btn-whatsapp');
+    btn.disabled = true;
+    const conInternet = await hayInternet();
+    btn.disabled = false;
+
+    // Sin internet: el enlace se muestra como código QR para escanearlo con otro celular
+    if (!conInternet) { mostrarQR(url); return; }
+
+    // Con internet: se abre WhatsApp como siempre
     ofrecerVaciarAlVolver();
-    if (!navigator.onLine && movil) {
-      // Sin señal la página wa.me no carga: se abre la app de WhatsApp directamente.
-      // El mensaje queda con el relojito y WhatsApp lo envía solo cuando vuelva la señal.
-      location.href = `whatsapp://send?phone=${numero}&text=${texto}`;
-      return;
-    }
-    const url = 'https://wa.me/' + numero + '?text=' + texto;
     const w = window.open(url, '_blank');
     if (w) w.opener = null;
     else location.href = url;
+  }
+
+  // navigator.onLine solo dice si hay red, no si hay internet (en zonas rurales
+  // es común tener señal sin datos). Se confirma con una petición rápida.
+  async function hayInternet() {
+    if (!navigator.onLine) return false;
+    const control = new AbortController();
+    const t = setTimeout(() => control.abort(), 2500);
+    try {
+      await fetch('https://wa.me/?_=' + Date.now(), { mode: 'no-cors', cache: 'no-store', signal: control.signal });
+      return true;
+    } catch (e) {
+      return false;
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
+  function mostrarQR(url) {
+    const cont = $('#qr-codigo');
+    const unidades = estado.carrito.reduce((s, i) => s + i.cant, 0);
+    let qr = null;
+    try { qr = QR.crear(url); } catch (e) { /* demasiado largo */ }
+    if (qr) {
+      cont.innerHTML = QR.svg(qr, 'Código QR para enviar la cotización por WhatsApp');
+      cont.hidden = false;
+      $('#qr-resumen').textContent = `${estado.carrito.length} producto(s), ${unidades} unidad(es).`;
+      $('#qr-denso').hidden = qr.version <= 25;
+    } else {
+      cont.innerHTML = '';
+      cont.hidden = true;
+      $('#qr-resumen').textContent = 'La lista es demasiado larga para un solo código QR. Divide la cotización en dos listas más cortas.';
+      $('#qr-denso').hidden = true;
+    }
+    $('#btn-qr-listo').hidden = !qr;
+    $('#qr-abrir').href = url;
+    $('#dlg-qr').showModal();
+  }
+
+  function vaciarLista() {
+    const ids = estado.carrito.map(i => i.id);
+    estado.carrito = [];
+    guardarCarrito();
+    ids.forEach(refrescarTarjeta);
+    $('#cliente-nombre').value = '';
+    $('#cliente-nota').value = '';
+    try { localStorage.removeItem('cliente-nombre'); } catch (e) {}
   }
 
   // Al regresar de WhatsApp, ofrecer limpiar la lista para atender al siguiente cliente
@@ -354,13 +403,7 @@
       document.removeEventListener('visibilitychange', alVolver);
       setTimeout(() => {
         if (!estado.carrito.length || !confirm('¿Ya enviaste la cotización por WhatsApp?\n\nToca "Aceptar" para vaciar la lista y empezar una nueva.')) return;
-        const ids = estado.carrito.map(i => i.id);
-        estado.carrito = [];
-        guardarCarrito();
-        ids.forEach(refrescarTarjeta);
-        $('#cliente-nombre').value = '';
-        $('#cliente-nota').value = '';
-        try { localStorage.removeItem('cliente-nombre'); } catch (e) {}
+        vaciarLista();
         $('#dlg-carrito').close();
         toast('Lista vacía. Lista para el siguiente cliente.');
       }, 400);
@@ -517,11 +560,14 @@
     $('#form-cotizar').addEventListener('submit', enviarWhatsApp);
     $('#btn-vaciar').addEventListener('click', () => {
       if (!confirm('¿Quitar todos los productos de tu lista?')) return;
-      const ids = estado.carrito.map(i => i.id);
-      estado.carrito = [];
-      guardarCarrito();
-      ids.forEach(refrescarTarjeta);
+      vaciarLista();
       pintarCarrito();
+    });
+    $('#btn-qr-listo').addEventListener('click', () => {
+      vaciarLista();
+      $('#dlg-qr').close();
+      $('#dlg-carrito').close();
+      toast('Lista vacía. Lista para el siguiente cliente.');
     });
 
     // Menú sin conexión
